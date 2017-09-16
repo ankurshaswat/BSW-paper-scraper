@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Weather Man</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <style>
+        .box {
+
+
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+	<div class="other">Please Wait</div>
+    <div class="box">
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+	var dict = {};
+        var url = 'http://bsw.iitd.ac.in/ques.php'
+        var arr=new Array();
+        $.get('scraper.php?url=' + url, function(data) {
+            $(".box").html(data);
+            var array = new Array();
+            $(".box .container .row .col-md-8 ul a").each(function() {
+                array.push($(this).html());
+            });
+            
+            for (x in array) {
+                (function(urlx) {
+                  var url2 = 'http://bsw.iitd.ac.in/QuestionPapers/' + urlx + '.php';
+
+                    var xhr = $.get('scraper.php?url=' + url2, function(data2) {
+                      $(".box").html(data2);
+                      var array2 = new Array();
+                      $(".box .container .row .col-md-8 ul a").each(function() {
+
+                          array2.push($(this).attr('href'));
+                      });
+                      var Minor1 = new Array();
+                      var Minor2 = new Array();
+                      var Major = new Array();
+                      var Other = new Array();
+                      for (var j = 0; j < array2.length; j++) {
+                          //console.log(array2[j]);
+                          if (array2[j].indexOf("Minor1") >= 0) {
+                              var link = "http://bsw.iitd.ac.in/QuestionPapers/" + array2[j];
+                              Minor1.push(link);
+                          } else if (array2[j].indexOf("Minor2") >= 0) {
+                              var link = "http://bsw.iitd.ac.in/QuestionPapers/" + array2[j];
+                              Minor2.push(link);
+                          } else if (array2[j].indexOf("Major") >= 0) {
+                              var link = "http://bsw.iitd.ac.in/QuestionPapers/" + array2[j];
+                              Major.push(link);
+                          } else {
+                              var link = "http://bsw.iitd.ac.in/QuestionPapers/" + array2[j];
+                              Other.push(link);
+                          }
+
+
+                      }
+
+                      var dict2 = {Minor1:[],Minor2:[],Major:[],Other:[]};
+                      dict2.Minor1 = Minor1;
+                      dict2.Minor2 = Minor2;
+                      dict2.Major = Major;
+                      dict2.Other = Other;
+                      dict[urlx] = dict2;
+                      // console.log(dict);
+                      //console.log(dict2);
+                  });
+                      arr.push(xhr);
+                      })(array[x]);
+            }
+            // for (var i = 0; i < array.length; i++) {
+            //     var name = array[i];
+            //      console.log(name);
+            //
+
+
+
+            $.when.apply($, arr).then(function() {
+                var x=JSON.stringify(dict);
+	console.log(x);
+                 document.open();
+document.write(x);
+document.close();
+            
+
+                // $(document).html(dict);
+            });
+
+        });
+    </script>
+</body>
+
+</html>
